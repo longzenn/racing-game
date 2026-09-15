@@ -1,0 +1,22 @@
+﻿{
+  "name": "Cyber Racer 3D - Game Đua Xe Đỉnh Cao",
+  "short_name": "CyberRacer3D",
+  "description": "Game đua xe 3D đồ họa lung linh, đa dạng bản đồ, tốc độ cao trên Web và Windows 11",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#070814",
+  "theme_color": "#00f2ff",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,566 @@
+/* Cyber Racer 3D - Joyful Kids Candy & Toy Arcade Theme */
+:root {
+  --primary-pink: #ff3377;
+  --primary-blue: #00b4d8;
+  --primary-yellow: #ffb703;
+  --primary-green: #06d6a0;
+  --primary-purple: #7209b7;
+  --bg-hud: rgba(255, 255, 255, 0.95);
+  --text-dark: #1e293b;
+  --font-kids: 'Nunito', 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #87ceeb;
+  font-family: var(--font-kids);
+  color: var(--text-dark);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+#canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* === HUD LAYER === */
+#hud-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px 20px;
+}
+
+.hud-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  gap: 10px;
+}
+
+.hud-stat-box {
+  background: var(--bg-hud);
+  backdrop-filter: blur(8px);
+  border: 3px solid #ffffff;
+  border-radius: 20px;
+  padding: 6px 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1), 0 3px 0 #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-stat-icon {
+  font-size: 22px;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15));
+}
+
+.hud-stat-val {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.hud-stat-unit {
+  font-size: 13px;
+  font-weight: 800;
+  color: #64748b;
+  margin-left: 2px;
+}
+
+#coin-val { color: #f59e0b; text-shadow: 1px 1px 0 #fff; }
+#time-val { color: #0284c7; text-shadow: 1px 1px 0 #fff; }
+#speed-digital-val { color: #0d9488; text-shadow: 1px 1px 0 #fff; }
+#score-val { color: #e11d48; text-shadow: 1px 1px 0 #fff; }
+
+.btn-sound-toggle {
+  background: var(--bg-hud);
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 3px 0 #cbd5e1;
+  pointer-events: auto;
+  transition: transform 0.1s;
+}
+.btn-sound-toggle:active {
+  transform: scale(0.9);
+}
+
+/* Combo Banner */
+#combo-banner {
+  position: absolute;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  font-size: 24px;
+  font-weight: 900;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff007f, #ff7700);
+  border: 3px solid #ffffff;
+  border-radius: 24px;
+  padding: 6px 24px;
+  box-shadow: 0 6px 20px rgba(255, 0, 127, 0.35), 0 3px 0 #b30059;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+  z-index: 12;
+}
+#combo-banner.show {
+  transform: translateX(-50%) scale(1.05);
+}
+
+#active-powerups {
+  position: absolute;
+  top: 76px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  z-index: 12;
+  pointer-events: none;
+}
+
+.powerup-badge {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #ff3377;
+  border-radius: 14px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e293b;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Touch Controls */
+#touch-controls {
+  position: absolute;
+  bottom: 25px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 30px;
+  pointer-events: none;
+}
+
+.touch-btn {
+  pointer-events: auto;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  border: 3px solid #00b4d8;
+  color: #00b4d8;
+  font-size: 28px;
+  font-weight: 900;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15), 0 3px 0 #cbd5e1;
+  touch-action: none;
+  transition: all 0.1s;
+}
+.touch-btn:active {
+  background: #00b4d8;
+  color: #ffffff;
+  transform: scale(0.92);
+}
+
+/* === FULLSCREEN 1-COLUMN CANDY TOY MODAL (NO SCROLL) === */
+.screen-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 30;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.4) 0%, rgba(135, 206, 235, 0.85) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  overflow: hidden;
+}
+
+/* 1 Column Candy Toy Card (Enlarged & Comfortable) */
+.candy-modal {
+  width: 95%;
+  max-width: 760px;
+  max-height: 96vh;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(14px);
+  border: 4px solid #ffffff;
+  border-radius: 32px;
+  padding: 18px 26px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.2), 0 8px 0 #cbd5e1, inset 0 2px 6px rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  gap: 10px;
+}
+
+/* Cute Header */
+.candy-header {
+  text-align: center;
+}
+
+.header-badges {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.cute-pill {
+  font-size: 13px;
+  font-weight: 900;
+  color: #d946ef;
+  background: #fae8ff;
+  border: 2px solid #f0abfc;
+  padding: 3px 14px;
+  border-radius: 14px;
+  display: inline-block;
+}
+
+.high-score-pill {
+  font-size: 13px;
+  font-weight: 900;
+  color: #475569;
+  background: #fef3c7;
+  border: 2px solid #fde047;
+  padding: 3px 14px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.candy-title {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #ff007f 0%, #ff7700 50%, #ffbb00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(255, 0, 127, 0.25));
+  line-height: 1.15;
+  animation: jiggle 3.5s ease-in-out infinite;
+}
+
+@keyframes jiggle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* Candy Section */
+.candy-section {
+  background: #f8fafc;
+  border: 2px solid #edf2f7;
+  border-radius: 18px;
+  padding: 8px 14px;
+}
+
+.candy-label {
+  font-size: 14px;
+  font-weight: 900;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+/* Grids */
+.mini-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.mini-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+/* Candy Card Items */
+.candy-card {
+  background: #ffffff;
+  border: 2.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 8px 8px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04), 0 3px 0 #cbd5e1;
+}
+
+.candy-card:hover {
+  transform: translateY(-3px) scale(1.04);
+  border-color: #38bdf8;
+  box-shadow: 0 6px 14px rgba(56, 189, 248, 0.25), 0 3px 0 #0284c7;
+}
+
+.candy-card.selected {
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  border-color: #0284c7;
+  border-width: 2.5px;
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.3), 0 4px 0 #0369a1;
+  transform: scale(1.02);
+}
+
+.candy-icon-bounce {
+  font-size: 32px;
+  line-height: 1.1;
+  margin-bottom: 3px;
+  transition: transform 0.2s;
+}
+.candy-card:hover .candy-icon-bounce {
+  transform: scale(1.15);
+}
+
+.candy-name {
+  font-size: 14px;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Dual row: Color Palette + Speed */
+.candy-row-duo {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 12px;
+}
+
+.candy-sub-section {
+  background: #f8fafc;
+  border: 2px solid #edf2f7;
+  border-radius: 18px;
+  padding: 8px 12px;
+}
+
+/* Color Palette */
+.candy-palette {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-around;
+  padding: 4px 0;
+}
+
+.color-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.7);
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.color-dot:hover {
+  transform: scale(1.25);
+}
+
+.color-dot.selected {
+  border-color: #0f172a;
+  box-shadow: 0 0 0 3.5px #38bdf8, 0 4px 10px rgba(0,0,0,0.25);
+  transform: scale(1.25);
+}
+
+/* Speed Badges */
+.speed-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 900;
+  margin-bottom: 3px;
+  white-space: nowrap;
+}
+.bg-green { background: #dcfce7; color: #16a34a; }
+.bg-orange { background: #fef3c7; color: #d97706; }
+.bg-red { background: #ffe4e6; color: #e11d48; }
+
+/* Giant 3D Candy Play Button */
+.btn-candy-play {
+  background: linear-gradient(135deg, #ff3377 0%, #ff7700 100%);
+  border: 3px solid #ffffff;
+  border-radius: 22px;
+  padding: 13px 24px;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255, 51, 119, 0.4), 0 5px 0 #b30047;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.1s ease;
+  font-family: var(--font-kids);
+  animation: pulse-button 2.5s infinite;
+}
+
+@keyframes pulse-button {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); box-shadow: 0 10px 28px rgba(255, 51, 119, 0.5), 0 5px 0 #b30047; }
+}
+
+.btn-candy-play:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 30px rgba(255, 51, 119, 0.55), 0 5px 0 #b30047;
+}
+
+.btn-candy-play:active {
+  transform: translateY(4px);
+  box-shadow: 0 3px 10px rgba(255, 51, 119, 0.3), 0 1px 0 #b30047;
+  animation: none;
+}
+
+.btn-play-text {
+  font-size: 23px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.25);
+}
+
+.btn-play-icon {
+  font-size: 26px;
+}
+
+/* Footer info */
+.candy-footer {
+  text-align: center;
+}
+
+.footer-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.btn-candy-mini {
+  background: #f1f5f9;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #475569;
+  cursor: pointer;
+  font-family: var(--font-kids);
+  transition: background 0.15s;
+}
+.btn-candy-mini:hover {
+  background: #e2e8f0;
+}
+
+.candy-hint {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+/* Modals (Pause / Gameover) */
+.modal-content {
+  max-width: 440px;
+  width: 90%;
+  background: #ffffff;
+  border: 4px solid #ffffff;
+  border-radius: 26px;
+  padding: 22px 26px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18), 0 8px 0 #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#gameover-modal, #pause-modal {
+  display: none;
+}
+
+.result-score-box {
+  background: #f8fafc;
+  border: 3px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 14px 30px;
+  margin: 12px 0;
+  text-align: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.result-score-val {
+  font-size: 44px;
+  font-weight: 900;
+  color: #e11d48;
+}
+
+.result-high-val {
+  font-size: 14px;
+  font-weight: 800;
+  color: #64748b;
+  margin-top: 3px;
+}
+
+.btn-secondary {
+  background: #f1f5f9;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #334155;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-kids);
+  box-shadow: 0 2px 0 #cbd5e1;
+}
+.btn-secondary:hover {
+  background: #e2e8f0;
+}

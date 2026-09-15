@@ -1,0 +1,234 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Game Đua Xe Bắt Xu 3D Vui Nhộn Cho Bé</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png">
+  <meta name="theme-color" content="#ff3377">
+  <meta name="description" content="Game lái xe bắt xu 3D rực rỡ vui nhộn cho trẻ em trên Web và Windows 11">
+  <!-- Google Fonts Nunito - Perfect Vietnamese Font Support -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- WebGL 3D Canvas -->
+  <div id="canvas-container"></div>
+
+  <!-- In-Game HUD -->
+  <div id="hud-layer">
+    <div class="hud-top">
+      <div class="hud-stat-box">
+        <span class="hud-stat-icon">🪙</span>
+        <span class="hud-stat-val" id="coin-val">0</span>
+      </div>
+
+      <div class="hud-stat-box">
+        <span class="hud-stat-icon">⏰</span>
+        <span class="hud-stat-val" id="time-val">90s</span>
+      </div>
+
+      <div class="hud-stat-box">
+        <span class="hud-stat-icon">🏎️</span>
+        <span class="hud-stat-val" id="speed-digital-val">0</span>
+        <span class="hud-stat-unit">km/h</span>
+      </div>
+
+      <div class="hud-stat-box">
+        <span class="hud-stat-icon">⭐</span>
+        <span class="hud-stat-val" id="score-val">0</span>
+      </div>
+
+      <button class="btn-sound-toggle" id="btn-sound-toggle" title="Bật/Tắt Âm Thanh">🔊</button>
+    </div>
+
+    <!-- Combo Banner -->
+    <div id="combo-banner">⭐ 2X COMBO XU! ⭐</div>
+
+    <!-- Active Powerups -->
+    <div id="active-powerups"></div>
+
+    <!-- Touch Controls -->
+    <div id="touch-controls">
+      <div class="touch-btn" id="touch-left">◀</div>
+      <div class="touch-btn" id="touch-right">▶</div>
+    </div>
+  </div>
+
+  <!-- Main Menu Overlay: 1 Column Candy Toy Theme (No Scroll) -->
+  <div class="screen-overlay" id="main-menu">
+    <div class="candy-modal">
+
+      <!-- Cute Animated Header -->
+      <div class="candy-header">
+        <div class="header-badges">
+          <span class="cute-pill">✨ Game Vui Nhộn Cho Bé ✨</span>
+          <div class="high-score-pill">
+            <span>👑 Kỷ Lục:</span>
+            <span class="menu-highscore-val" style="color: #ff8800; font-weight: 900;">0</span>
+          </div>
+        </div>
+        <h1 class="candy-title">🚗 ĐUA XE BẮT XU 3D 🌈</h1>
+      </div>
+
+      <!-- 1. Map Selection (4 items in 1 row) -->
+      <div class="candy-section">
+        <div class="candy-label"><span>🗺️</span> Chọn Đường Đua Của Bé</div>
+        <div class="mini-grid-4">
+          <div class="candy-card map-card selected" data-map="rainbow">
+            <div class="candy-icon-bounce">🌈</div>
+            <div class="candy-name">Cầu Vồng</div>
+          </div>
+          <div class="candy-card map-card" data-map="synthwave">
+            <div class="candy-icon-bounce">🏖️</div>
+            <div class="candy-name">Bãi Biển</div>
+          </div>
+          <div class="candy-card map-card" data-map="cyberpunk">
+            <div class="candy-icon-bounce">🏙️</div>
+            <div class="candy-name">Đồ Chơi</div>
+          </div>
+          <div class="candy-card map-card" data-map="desert">
+            <div class="candy-icon-bounce">🦕</div>
+            <div class="candy-name">Khủng Long</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Car Selection (4 items in 1 row) -->
+      <div class="candy-section">
+        <div class="candy-label"><span>🏎️</span> Chọn Xe Đua Đáng Yêu</div>
+        <div class="mini-grid-4">
+          <div class="candy-card car-card selected" data-car="buggy">
+            <div class="candy-icon-bounce">🚗</div>
+            <div class="candy-name">Mắt Tròn</div>
+          </div>
+          <div class="candy-card car-card" data-car="roadster">
+            <div class="candy-icon-bounce">🏎️</div>
+            <div class="candy-name">Tia Chớp</div>
+          </div>
+          <div class="candy-card car-card" data-car="phantom">
+            <div class="candy-icon-bounce">🚀</div>
+            <div class="candy-name">Phi Thuyền</div>
+          </div>
+          <div class="candy-card car-card" data-car="interceptor">
+            <div class="candy-icon-bounce">🚙</div>
+            <div class="candy-name">Bọc Thép</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Paint Color + Speed Mode (Combined Compact Row) -->
+      <div class="candy-row-duo">
+        <!-- Paint palette -->
+        <div class="candy-sub-section">
+          <div class="candy-label"><span>🎨</span> Màu Xe</div>
+          <div class="candy-palette">
+            <div class="color-dot selected" style="background-color:#ff3366;" data-color="ff3366" title="Đỏ Dâu"></div>
+            <div class="color-dot" style="background-color:#00d2ff;" data-color="00d2ff" title="Xanh Trời"></div>
+            <div class="color-dot" style="background-color:#ffbb00;" data-color="ffbb00" title="Vàng Chuối"></div>
+            <div class="color-dot" style="background-color:#ff66cc;" data-color="ff66cc" title="Hồng Kẹo"></div>
+            <div class="color-dot" style="background-color:#00e676;" data-color="00e676" title="Bạc Hà"></div>
+            <div class="color-dot" style="background-color:#b5179e;" data-color="b5179e" title="Tím Nho"></div>
+          </div>
+        </div>
+
+        <!-- Speed selection -->
+        <div class="candy-sub-section">
+          <div class="candy-label"><span>⚡</span> Tốc Độ</div>
+          <div class="mini-grid-3">
+            <div class="candy-card speed-card" data-speed="cruise">
+              <span class="speed-badge bg-green">DỄ ⭐</span>
+              <div class="candy-name">50 km/h</div>
+            </div>
+            <div class="candy-card speed-card selected" data-speed="sport">
+              <span class="speed-badge bg-orange">VỪA 🔥</span>
+              <div class="candy-name">90 km/h</div>
+            </div>
+            <div class="candy-card speed-card" data-speed="hyperspeed">
+              <span class="speed-badge bg-red">SIÊU ⚡</span>
+              <div class="candy-name">150 km/h</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Giant Play Button -->
+      <button class="btn-candy-play" id="btn-start-game">
+        <span class="btn-play-icon">🏁</span>
+        <span class="btn-play-text">BẮT ĐẦU CHƠI NGAY!</span>
+        <span class="btn-play-icon">🚀</span>
+      </button>
+
+      <!-- Sub controls & hint -->
+      <div class="candy-footer">
+        <div class="footer-buttons">
+          <button class="btn-candy-mini" id="btn-fullscreen">⛶ Toàn màn hình</button>
+          <button class="btn-windows-install" style="display:none">🪟 Cài đặt App Windows 11</button>
+        </div>
+        <div class="candy-hint">
+          🎮 Phím <b>A / D</b> hoặc <b>◀ ▶</b> lái xe &bull; Ăn bình <b>Tên Lửa</b> để Siêu Tốc &bull; Phím <b>C</b> đổi góc nhìn
+        </div>
+      </div>
+
+    </div><!-- end candy-modal -->
+  </div>
+
+  <!-- Pause Modal -->
+  <div class="screen-overlay" id="pause-modal">
+    <div class="modal-content" style="max-width: 440px;">
+      <h2 style="font-size: 32px; font-weight: 900; margin-bottom: 16px; color: #0284c7;">ĐANG TẠM DỪNG ⏸</h2>
+      <button class="btn-candy-play" id="btn-resume" style="width: 100%; margin-top: 6px; font-size: 20px; padding: 12px 20px;">TIẾP TỤC ĐUA ▶</button>
+      <button class="btn-secondary" id="btn-restart" style="width: 100%; margin-top: 10px; justify-content: center;">Chơi Lại Vòng Này</button>
+      <button class="btn-secondary" id="btn-menu" style="width: 100%; margin-top: 10px; justify-content: center;">Về Menu Chọn Map</button>
+    </div>
+  </div>
+
+  <!-- Game Over Modal -->
+  <div class="screen-overlay" id="gameover-modal">
+    <div class="modal-content" style="max-width: 460px;">
+      <h2 style="font-size: 38px; font-weight: 900; color: #e11d48;">HẾT GIỜ RỒI! 🎉</h2>
+      <div class="result-score-box">
+        <div style="font-size: 15px; font-weight: 800; color: #64748b; letter-spacing: 1px;">ĐIỂM SỐ CỦA BÉ</div>
+        <div class="result-score-val" id="final-score-val">0</div>
+        <div style="font-size: 19px; color: #f59e0b; font-weight: 900; margin-top: 6px;">🪙 Số xu nhặt được: <span id="final-coins-val">0</span></div>
+        <div class="result-high-val" id="final-highscore-val">Điểm kỷ lục: 0</div>
+      </div>
+
+      <button class="btn-candy-play" id="btn-play-again" style="width: 100%; font-size: 20px; padding: 12px 20px;">CHƠI LẠI NÀO 🏎️</button>
+      <button class="btn-secondary" id="btn-gameover-menu" style="width: 100%; margin-top: 10px; justify-content: center;">Về Menu Chọn Map</button>
+      <button class="btn-windows-install" style="margin-top: 12px; display:none">🪟 Cài đặt Game làm App trên Windows 11</button>
+    </div>
+  </div>
+
+  <!-- Three.js and Post-Processing Libraries (100% Local & Offline Ready) -->
+  <script src="lib/three.min.js"></script>
+  <script src="lib/CopyShader.js"></script>
+  <script src="lib/LuminosityHighPassShader.js"></script>
+  <script src="lib/EffectComposer.js"></script>
+  <script src="lib/RenderPass.js"></script>
+  <script src="lib/ShaderPass.js"></script>
+  <script src="lib/UnrealBloomPass.js"></script>
+
+  <!-- Game Modules -->
+  <script src="js/config.js"></script>
+  <script src="js/engine/AudioManager.js"></script>
+  <script src="js/engine/InputManager.js"></script>
+  <script src="js/engine/Renderer.js"></script>
+  <script src="js/world/RoadManager.js"></script>
+  <script src="js/world/Environment.js"></script>
+  <script src="js/world/WeatherVFX.js"></script>
+  <script src="js/entities/Car.js"></script>
+  <script src="js/entities/TrafficCar.js"></script>
+  <script src="js/entities/Coin.js"></script>
+  <script src="js/entities/Obstacles.js"></script>
+  <script src="js/entities/Powerups.js"></script>
+  <script src="js/vfx/ParticleSystem.js"></script>
+  <script src="js/ui/HUD.js"></script>
+  <script src="js/ui/MenuManager.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
