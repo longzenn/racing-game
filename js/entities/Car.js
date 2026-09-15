@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Player Car Entity - Ultra-Cute Chibi Cartoon Toy Cars (Kids Edition)
  * Featuring animated kawaii eyes, smiling faces, blushing cheeks, spring antennas & bouncy physics!
  */
@@ -339,13 +339,21 @@ class Car {
     const hlRight = new THREE.Mesh(headGeo, headMat); hlRight.position.set(0.8, 0.9, -2.2);
     this.group.add(hlLeft, hlRight);
 
-    // Front Spotlights illuminating the road
-    const spotLight = new THREE.SpotLight(0xffffff, 1.6, 60, Math.PI / 5, 0.4, 1);
-    spotLight.position.set(0, 1.5, -2.5);
-    const targetObj = new THREE.Object3D();
-    targetObj.position.set(0, 0, -35);
-    this.group.add(spotLight, targetObj);
-    spotLight.target = targetObj;
+    // Front Glowing Headlight Beams
+    const beamGeo = new THREE.CylinderGeometry(0.2, 0.9, 8.0, 12, 1, true);
+    const beamMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.15,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    });
+    const beamL = new THREE.Mesh(beamGeo, beamMat);
+    beamL.rotation.x = Math.PI * 0.48;
+    beamL.position.set(-0.8, 0.8, -6.0);
+    const beamR = beamL.clone();
+    beamR.position.set(0.8, 0.8, -6.0);
+    this.group.add(beamL, beamR);
 
     // Brake Lights
     const brakeMat = new THREE.MeshBasicMaterial({ color: 0xff0033 });

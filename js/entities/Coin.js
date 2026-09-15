@@ -1,28 +1,26 @@
 ﻿/**
- * 3D Gold Coins with rotation, glow and magnet attraction
+ * 3D Gold Coins with rotation, glow and magnet attraction (Ultra-Optimized)
  */
 class CoinManager {
   constructor(scene) {
     this.scene = scene;
     this.coins = [];
 
-    // Reusable Coin Geometry
-    this.coinGeo = new THREE.CylinderGeometry(1.0, 1.0, 0.25, 24);
+    // Reusable Shared Geometries & Materials (Zero runtime allocations)
+    this.coinGeo = new THREE.CylinderGeometry(1.0, 1.0, 0.25, 20);
     this.coinMat = new THREE.MeshStandardMaterial({
       color: 0xffd700,
-      emissive: 0xff9900,
-      emissiveIntensity: 0.7,
-      metalness: 0.9,
-      roughness: 0.1
+      emissive: 0xffaa00,
+      emissiveIntensity: 0.85,
+      metalness: 0.85,
+      roughness: 0.15
     });
 
-    // Star Relief on both faces
-    this.starGeo = new THREE.SphereGeometry(0.45, 5, 2);
+    this.starGeo = new THREE.SphereGeometry(0.45, 6, 4);
     this.starMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
-    // Halo ring around coin
-    this.haloGeo = new THREE.TorusGeometry(1.35, 0.06, 8, 24);
-    this.haloMat = new THREE.MeshBasicMaterial({ color: 0xffdd00, transparent: true, opacity: 0.75 });
+    this.haloGeo = new THREE.TorusGeometry(1.35, 0.06, 6, 20);
+    this.haloMat = new THREE.MeshBasicMaterial({ color: 0xffea00, transparent: true, opacity: 0.8 });
   }
 
   spawnCoin() {
@@ -47,22 +45,16 @@ class CoinManager {
     star2.scale.set(1, 1, 0.2);
     coinGroup.add(star2);
 
-    // Golden halo ring
+    // Golden halo ring (Glows intensely with Bloom, no heavy point light needed!)
     const halo = new THREE.Mesh(this.haloGeo, this.haloMat);
     halo.rotation.x = Math.PI / 2;
     coinGroup.add(halo);
-
-    // Point light - warm golden glow
-    const light = new THREE.PointLight(0xffcc00, 1.2, 7);
-    light.position.set(0, 0, 0);
-    coinGroup.add(light);
 
     coinGroup.position.set(laneX, 1.4, -CONFIG.VIEW_DISTANCE + 40);
     this.scene.add(coinGroup);
 
     this.coins.push({
       mesh: coinGroup,
-      light: light,
       rotSpeed: 4.5 + Math.random() * 2,
       bobOffset: Math.random() * Math.PI * 2
     });
@@ -70,18 +62,13 @@ class CoinManager {
 
   update(playerSpeed, playerPos, magnetActive, dt) {
     const moveDist = playerSpeed * dt;
+    const nowTime = Date.now() * 0.005;
 
     for (let i = this.coins.length - 1; i >= 0; i--) {
       const c = this.coins[i];
       c.mesh.position.z += moveDist;
       c.mesh.rotation.y += c.rotSpeed * dt;
-      const bobY = 1.4 + Math.sin(Date.now() * 0.005 + c.bobOffset) * 0.25;
-      c.mesh.position.y = bobY;
-
-      // Pulse the glow intensity
-      if (c.light) {
-        c.light.intensity = 1.0 + Math.sin(Date.now() * 0.008 + c.bobOffset) * 0.4;
-      }
+      c.mesh.position.y = 1.4 + Math.sin(nowTime + c.bobOffset) * 0.25;
 
       // Magnet attraction physics
       if (magnetActive) {

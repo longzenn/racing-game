@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Three.js Graphics Engine & Post-Processing Pipeline
  * Optimized for vibrant, crisp kids visuals without overexposure!
  */
@@ -138,6 +138,16 @@ class GraphicsRenderer {
       const dronePos = new THREE.Vector3(carPosition.x * 0.2, 17, 16).add(shakeOffset);
       this.camera.position.lerp(dronePos, 10 * dt);
       this.camera.lookAt(0, 0, -12);
+    }
+  }
+
+  precompileShaders() {
+    try {
+      if (this.renderer && this.scene && this.camera) {
+        this.renderer.compile(this.scene, this.camera);
+      }
+    } catch (e) {
+      console.warn("Precompile shader error:", e);
     }
   }
 

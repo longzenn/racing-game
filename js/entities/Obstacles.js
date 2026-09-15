@@ -1,14 +1,14 @@
 ﻿/**
  * Road Obstacles (Neon Mushroom Monsters, Cyber Laser Barriers, Oil Slicks)
- * Enhanced with warning decals, shadows and high contrast glowing lights
+ * Optimized with cached geometries, warning decals and high-contrast bloom materials
  */
 class ObstacleManager {
   constructor(scene) {
     this.scene = scene;
     this.obstacles = [];
 
-    // Reusable warning shadow circle (High-contrast shadow decal on road)
-    this.shadowGeo = new THREE.CircleGeometry(1.6, 20);
+    // Reusable warning decals
+    this.shadowGeo = new THREE.CircleGeometry(1.6, 16);
     this.shadowMat = new THREE.MeshBasicMaterial({
       color: 0x000000,
       transparent: true,
@@ -16,14 +16,58 @@ class ObstacleManager {
       depthWrite: false
     });
 
-    // Warning hazard ring
-    this.warningRingGeo = new THREE.RingGeometry(1.5, 1.75, 24);
+    this.warningRingGeo = new THREE.RingGeometry(1.5, 1.75, 20);
     this.warningRingMat = new THREE.MeshBasicMaterial({
       color: 0xff1100,
       transparent: true,
       opacity: 0.85,
       side: THREE.DoubleSide
     });
+
+    // 1. Mushroom cached assets
+    this.mushStemGeo = new THREE.CylinderGeometry(0.55, 0.75, 1.4, 14);
+    this.mushStemMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: 0xfff0bb,
+      emissiveIntensity: 0.3,
+      roughness: 0.3
+    });
+    this.mushCapGeo = new THREE.SphereGeometry(1.4, 18, 14);
+    this.mushCapMat = new THREE.MeshStandardMaterial({
+      color: 0xff0033,
+      emissive: 0xee0011,
+      emissiveIntensity: 0.85,
+      roughness: 0.2
+    });
+    this.mushSpotGeo = new THREE.SphereGeometry(0.28, 6, 6);
+    this.mushSpotMat = new THREE.MeshBasicMaterial({ color: 0xffea00 });
+    this.whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    this.blackMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    this.eyeGeo = new THREE.SphereGeometry(0.35, 8, 8);
+    this.pupilGeo = new THREE.SphereGeometry(0.18, 6, 6);
+
+    // 2. Barrier cached assets
+    this.pylonGeo = new THREE.BoxGeometry(0.6, 2.2, 0.6);
+    this.pylonMat = new THREE.MeshStandardMaterial({
+      color: 0x111111,
+      emissive: 0xff4400,
+      emissiveIntensity: 0.4,
+      metalness: 0.8
+    });
+    this.laserBeamGeo = new THREE.CylinderGeometry(0.16, 0.16, 4.0, 10);
+    this.laserBeamMat = new THREE.MeshBasicMaterial({ color: 0xff0044 });
+
+    // 3. Oil slick cached assets
+    this.oilGeo = new THREE.CircleGeometry(1.8, 16);
+    this.oilMat = new THREE.MeshStandardMaterial({
+      color: 0x0a0a0f,
+      emissive: 0x1a0933,
+      emissiveIntensity: 0.4,
+      roughness: 0.05,
+      metalness: 0.95
+    });
+    this.oilRingGeo = new THREE.RingGeometry(1.7, 1.9, 20);
+    this.oilRingMat = new THREE.MeshBasicMaterial({ color: 0xbb00ff, side: THREE.DoubleSide });
   }
 
   spawnObstacle() {
@@ -45,7 +89,7 @@ class ObstacleManager {
       obsGroup = this.createOilSlick();
     }
 
-    // Add high-contrast road shadow and warning ring for 3D depth
+    // Add road shadow and warning ring for 3D depth
     const shadow = new THREE.Mesh(this.shadowGeo, this.shadowMat);
     shadow.rotation.x = -Math.PI / 2;
     shadow.position.y = 0.03;
@@ -66,60 +110,32 @@ class ObstacleManager {
     });
   }
 
-  // --- 1. Neon Mushroom Monster (High contrast glowing red & neon yellow) ---
+  // --- 1. Neon Mushroom Monster ---
   createNeonMushroom() {
     const mushroom = new THREE.Group();
 
-    // Stem with dark outline feeling
-    const stemGeo = new THREE.CylinderGeometry(0.55, 0.75, 1.4, 16);
-    const stemMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      emissive: 0xfff0bb,
-      emissiveIntensity: 0.3,
-      roughness: 0.3
-    });
-    const stem = new THREE.Mesh(stemGeo, stemMat);
+    const stem = new THREE.Mesh(this.mushStemGeo, this.mushStemMat);
     stem.position.y = 0.7;
     mushroom.add(stem);
 
-    // Glowing Cap
-    const capGeo = new THREE.SphereGeometry(1.4, 20, 16);
-    const capMat = new THREE.MeshStandardMaterial({
-      color: 0xff0033,
-      emissive: 0xee0011,
-      emissiveIntensity: 0.75,
-      roughness: 0.2
-    });
-    const cap = new THREE.Mesh(capGeo, capMat);
+    const cap = new THREE.Mesh(this.mushCapGeo, this.mushCapMat);
     cap.scale.set(1.2, 0.7, 1.2);
     cap.position.y = 1.4;
     mushroom.add(cap);
 
     // Glowing Yellow Spots
-    const spotGeo = new THREE.SphereGeometry(0.28, 8, 8);
-    const spotMat = new THREE.MeshBasicMaterial({ color: 0xffea00 });
     [[0, 2.0, 0.9], [0.75, 1.8, -0.6], [-0.75, 1.8, -0.6]].forEach(pos => {
-      const spot = new THREE.Mesh(spotGeo, spotMat);
+      const spot = new THREE.Mesh(this.mushSpotGeo, this.mushSpotMat);
       spot.position.set(...pos);
       mushroom.add(spot);
     });
 
     // Cartoon Eyes
-    const eyeGeo = new THREE.SphereGeometry(0.35, 10, 10);
-    const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const pupilGeo = new THREE.SphereGeometry(0.18, 8, 8);
-    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
-
-    const lEye = new THREE.Mesh(eyeGeo, eyeMat); lEye.position.set(-0.45, 1.2, -1.0);
-    const lPupil = new THREE.Mesh(pupilGeo, pupilMat); lPupil.position.set(-0.45, 1.2, -1.25);
-    const rEye = new THREE.Mesh(eyeGeo, eyeMat); rEye.position.set(0.45, 1.2, -1.0);
-    const rPupil = new THREE.Mesh(pupilGeo, pupilMat); rPupil.position.set(0.45, 1.2, -1.25);
+    const lEye = new THREE.Mesh(this.eyeGeo, this.whiteMat); lEye.position.set(-0.45, 1.2, -1.0);
+    const lPupil = new THREE.Mesh(this.pupilGeo, this.blackMat); lPupil.position.set(-0.45, 1.2, -1.25);
+    const rEye = new THREE.Mesh(this.eyeGeo, this.whiteMat); rEye.position.set(0.45, 1.2, -1.0);
+    const rPupil = new THREE.Mesh(this.pupilGeo, this.blackMat); rPupil.position.set(0.45, 1.2, -1.25);
     mushroom.add(lEye, lPupil, rEye, rPupil);
-
-    // Red warning point-light for dynamic illumination
-    const light = new THREE.PointLight(0xff0033, 1.2, 8);
-    light.position.set(0, 1.5, 0);
-    mushroom.add(light);
 
     return mushroom;
   }
@@ -128,55 +144,27 @@ class ObstacleManager {
   createLaserBarrier() {
     const barrier = new THREE.Group();
 
-    // Side pylons (Bright orange-black striped)
-    const pylonGeo = new THREE.BoxGeometry(0.6, 2.2, 0.6);
-    const pylonMat = new THREE.MeshStandardMaterial({
-      color: 0x111111,
-      emissive: 0xff4400,
-      emissiveIntensity: 0.4,
-      metalness: 0.8
-    });
-
-    const pL = new THREE.Mesh(pylonGeo, pylonMat); pL.position.set(-2.0, 1.1, 0);
-    const pR = new THREE.Mesh(pylonGeo, pylonMat); pR.position.set(2.0, 1.1, 0);
+    const pL = new THREE.Mesh(this.pylonGeo, this.pylonMat); pL.position.set(-2.0, 1.1, 0);
+    const pR = new THREE.Mesh(this.pylonGeo, this.pylonMat); pR.position.set(2.0, 1.1, 0);
     barrier.add(pL, pR);
 
-    // Glowing Laser Beam
-    const beamGeo = new THREE.CylinderGeometry(0.16, 0.16, 4.0, 12);
-    const beamMat = new THREE.MeshBasicMaterial({ color: 0xff0044 });
-    const beam = new THREE.Mesh(beamGeo, beamMat);
+    const beam = new THREE.Mesh(this.laserBeamGeo, this.laserBeamMat);
     beam.rotation.z = Math.PI / 2;
     beam.position.set(0, 1.2, 0);
     barrier.add(beam);
 
-    // Laser Light
-    const light = new THREE.PointLight(0xff0044, 1.4, 9);
-    light.position.set(0, 1.2, 0);
-    barrier.add(light);
-
     return barrier;
   }
 
-  // --- 3. Slippery Oil Slick (High-contrast gloss black with iridescent edge) ---
+  // --- 3. Slippery Oil Slick ---
   createOilSlick() {
     const oil = new THREE.Group();
-    const geo = new THREE.CircleGeometry(1.8, 20);
-    const mat = new THREE.MeshStandardMaterial({
-      color: 0x0a0a0f,
-      emissive: 0x1a0933,
-      emissiveIntensity: 0.4,
-      roughness: 0.05,
-      metalness: 0.95
-    });
-    const mesh = new THREE.Mesh(geo, mat);
+    const mesh = new THREE.Mesh(this.oilGeo, this.oilMat);
     mesh.rotation.x = -Math.PI / 2;
     mesh.position.y = 0.05;
     oil.add(mesh);
 
-    // Iridescent neon purple hazard ring
-    const ringGeo = new THREE.RingGeometry(1.7, 1.9, 24);
-    const ringMat = new THREE.MeshBasicMaterial({ color: 0xbb00ff, side: THREE.DoubleSide });
-    const ring = new THREE.Mesh(ringGeo, ringMat);
+    const ring = new THREE.Mesh(this.oilRingGeo, this.oilRingMat);
     ring.rotation.x = -Math.PI / 2;
     ring.position.y = 0.06;
     oil.add(ring);

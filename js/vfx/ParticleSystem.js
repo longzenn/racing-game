@@ -1,5 +1,6 @@
 ﻿/**
- * Visual Effects & Particle Systems (Nitro Flames, Sparks, Coin Bursts, Shield Aura)
+ * Visual Effects & Particle Systems (Ultra-Optimized)
+ * Reusable geometries and materials to avoid GC hiccups
  */
 class VFXManager {
   constructor(scene) {
@@ -7,11 +8,19 @@ class VFXManager {
     this.particles = [];
     this.shieldMesh = null;
 
+    // Shared Geometries & Materials
+    this.pGeo = new THREE.SphereGeometry(0.25, 5, 5);
+    this.nitroMatCyan = new THREE.MeshBasicMaterial({ color: 0x00f2ff, transparent: true, opacity: 0.9 });
+    this.nitroMatOrange = new THREE.MeshBasicMaterial({ color: 0xff7700, transparent: true, opacity: 0.9 });
+    this.smokeMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 });
+    this.coinBurstMat = new THREE.MeshBasicMaterial({ color: 0xffea00 });
+    this.crashExplosionMat = new THREE.MeshBasicMaterial({ color: 0xff2200 });
+
     this.initShield();
   }
 
   initShield() {
-    const shieldGeo = new THREE.SphereGeometry(2.8, 24, 16);
+    const shieldGeo = new THREE.SphereGeometry(2.8, 20, 14);
     const shieldMat = new THREE.MeshBasicMaterial({
       color: 0x00f2ff,
       wireframe: true,
@@ -42,110 +51,97 @@ class VFXManager {
     if (!exhaustPoints || exhaustPoints.length === 0) return;
 
     for (let ep of exhaustPoints) {
-      // Calculate world pos of exhaust
       const worldPos = ep.clone().applyMatrix4(carGroup.matrixWorld);
-
-      const pGeo = new THREE.SphereGeometry(0.25, 6, 6);
       const isBlue = Math.random() > 0.3;
-      const pMat = new THREE.MeshBasicMaterial({
-        color: isBlue ? 0x00f2ff : 0xff7700,
-        transparent: true,
-        opacity: 0.9
-      });
-      const mesh = new THREE.Mesh(pGeo, pMat);
+      const mat = (isBlue ? this.nitroMatCyan : this.nitroMatOrange).clone();
+      const mesh = new THREE.Mesh(this.pGeo, mat);
       mesh.position.copy(worldPos);
       this.scene.add(mesh);
 
       const vel = new THREE.Vector3(
-        (Math.random() - 0.5) * 1.5,
-        (Math.random() - 0.5) * 1.5,
-        15 + Math.random() * 15 // Shoot backwards
+        (Math.random() - 0.5) * 1.2,
+        (Math.random() - 0.5) * 0.8,
+        3.0 + Math.random() * 2.0
       );
 
       this.particles.push({
         mesh: mesh,
-        vel: vel,
-        life: 0.22,
-        maxLife: 0.22,
+        velocity: vel,
+        life: 0.25,
+        maxLife: 0.25,
         scaleSpeed: -2.5
       });
     }
   }
 
-  // --- Tire Drift Smoke ---
+  // --- Drift Smoke Emitter ---
   emitDriftSmoke(carGroup) {
-    const pGeo = new THREE.SphereGeometry(0.4, 6, 6);
-    const pMat = new THREE.MeshBasicMaterial({
-      color: 0xcccccc,
-      transparent: true,
-      opacity: 0.5
-    });
-    const mesh = new THREE.Mesh(pGeo, pMat);
-    mesh.position.copy(carGroup.position);
-    mesh.position.y = 0.2;
-    mesh.position.z += 1.8;
+    const pos = carGroup.position.clone();
+    pos.y += 0.2;
+    pos.z += 1.5;
+    pos.x += (Math.random() - 0.5) * 1.5;
+
+    const mat = this.smokeMat.clone();
+    const mesh = new THREE.Mesh(this.pGeo, mat);
+    mesh.position.copy(pos);
+    mesh.scale.setScalar(1.2);
     this.scene.add(mesh);
 
     this.particles.push({
       mesh: mesh,
-      vel: new THREE.Vector3((Math.random() - 0.5) * 2, 1.5, 5),
-      life: 0.35,
-      maxLife: 0.35,
-      scaleSpeed: 3.0
+      velocity: new THREE.Vector3((Math.random() - 0.5) * 2, 1.5 + Math.random(), 4),
+      life: 0.4,
+      maxLife: 0.4,
+      scaleSpeed: 4.0
     });
   }
 
-  // --- Coin Pickup Sparkle Explosion ---
+  // --- Coin Burst VFX ---
   createCoinBurst(pos) {
-    for (let i = 0; i < 16; i++) {
-      const pGeo = new THREE.SphereGeometry(0.2, 6, 6);
-      const pMat = new THREE.MeshBasicMaterial({ color: 0xffd700 });
-      const mesh = new THREE.Mesh(pGeo, pMat);
+    for (let i = 0; i < 8; i++) {
+      const mat = this.coinBurstMat.clone();
+      const mesh = new THREE.Mesh(this.pGeo, mat);
       mesh.position.copy(pos);
       this.scene.add(mesh);
 
+      const angle = (i / 8) * Math.PI * 2;
+      const speed = 4 + Math.random() * 3;
       const vel = new THREE.Vector3(
-        (Math.random() - 0.5) * 16,
-        Math.random() * 14 + 4,
-        (Math.random() - 0.5) * 16
+        Math.cos(angle) * speed,
+        2 + Math.random() * 4,
+        Math.sin(angle) * speed
       );
 
       this.particles.push({
         mesh: mesh,
-        vel: vel,
-        gravity: 22,
-        life: 0.5,
-        maxLife: 0.5,
-        scaleSpeed: -1.0
+        velocity: vel,
+        life: 0.4,
+        maxLife: 0.4,
+        scaleSpeed: -1.5
       });
     }
   }
 
-  // --- Collision Sparks & Debris ---
+  // --- Crash Explosion VFX ---
   createCrashExplosion(pos) {
-    for (let i = 0; i < 24; i++) {
-      const pGeo = new THREE.BoxGeometry(0.35, 0.35, 0.35);
-      const colors = [0xff0044, 0xffaa00, 0xffffff];
-      const pMat = new THREE.MeshBasicMaterial({
-        color: colors[Math.floor(Math.random() * colors.length)]
-      });
-      const mesh = new THREE.Mesh(pGeo, pMat);
+    for (let i = 0; i < 12; i++) {
+      const mat = this.crashExplosionMat.clone();
+      const mesh = new THREE.Mesh(this.pGeo, mat);
       mesh.position.copy(pos);
       this.scene.add(mesh);
 
       const vel = new THREE.Vector3(
-        (Math.random() - 0.5) * 22,
-        Math.random() * 16 + 5,
-        (Math.random() - 0.5) * 22
+        (Math.random() - 0.5) * 10,
+        3 + Math.random() * 8,
+        (Math.random() - 0.5) * 10
       );
 
       this.particles.push({
         mesh: mesh,
-        vel: vel,
-        gravity: 26,
-        life: 0.65,
-        maxLife: 0.65,
-        scaleSpeed: -0.8
+        velocity: vel,
+        life: 0.5,
+        maxLife: 0.5,
+        scaleSpeed: -1.5
       });
     }
   }
@@ -155,23 +151,16 @@ class VFXManager {
       const p = this.particles[i];
       p.life -= dt;
 
-      if (p.gravity) {
-        p.vel.y -= p.gravity * dt;
-      }
-      p.mesh.position.addScaledVector(p.vel, dt);
+      p.mesh.position.addScaledVector(p.velocity, dt);
+      const scaleDelta = 1 + p.scaleSpeed * dt;
+      p.mesh.scale.multiplyScalar(Math.max(0.1, scaleDelta));
 
-      if (p.scaleSpeed) {
-        const s = Math.max(0.01, p.mesh.scale.x + p.scaleSpeed * dt);
-        p.mesh.scale.set(s, s, s);
-      }
-
-      if (p.mesh.material.transparent) {
+      if (p.mesh.material && p.mesh.material.opacity !== undefined) {
         p.mesh.material.opacity = Math.max(0, p.life / p.maxLife);
       }
 
       if (p.life <= 0) {
         this.scene.remove(p.mesh);
-        p.mesh.geometry.dispose();
         p.mesh.material.dispose();
         this.particles.splice(i, 1);
       }
@@ -181,6 +170,7 @@ class VFXManager {
   clear() {
     for (let p of this.particles) {
       this.scene.remove(p.mesh);
+      if (p.mesh.material) p.mesh.material.dispose();
     }
     this.particles = [];
   }

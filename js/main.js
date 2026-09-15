@@ -73,12 +73,34 @@ class Game {
     this.bindTouchUI();
     this.initSoundToggle();
     this.applyMap('rainbow');
-    this.playerCar.buildCar('buggy', 0xff3366); // Cute default car from demo!
+    this.playerCar.buildCar('buggy', 0xff3366);
     this.initPWA();
+    this.warmupAssets();
 
     // Start Loop
     this.animate = this.animate.bind(this);
     requestAnimationFrame(this.animate);
+  }
+
+  warmupAssets() {
+    try {
+      // Spawn 1 of each entity type to force WebGL pipeline to compile shaders
+      this.coins.spawnCoin();
+      this.obstacles.spawnObstacle();
+      this.powerups.spawnPowerup();
+      this.traffic.spawnCar(CONFIG.SPEED_MODES.sport);
+
+      // Precompile shaders in GPU VRAM
+      this.renderer.precompileShaders();
+
+      // Clean up warmup objects cleanly
+      this.coins.clear();
+      this.obstacles.clear();
+      this.powerups.clear();
+      this.traffic.clear();
+    } catch (e) {
+      console.warn("Warmup notice:", e);
+    }
   }
 
   initSoundToggle() {
@@ -116,6 +138,7 @@ class Game {
   }
 
   startGame(cfg) {
+    this.clock.getDelta(); // Clear any accumulated delta from menu pause
     this.audio.init();
     this.applyMap(cfg.mapId);
     this.currentSpeedTier = CONFIG.SPEED_MODES[cfg.speedId] || CONFIG.SPEED_MODES.sport;
