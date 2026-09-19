@@ -168,24 +168,42 @@ body, html {
 /* Touch Controls */
 #touch-controls {
   position: absolute;
-  bottom: 25px;
+  bottom: 20px;
   left: 0;
   width: 100%;
   display: flex;
   justify-content: space-between;
-  padding: 0 30px;
+  align-items: center;
+  padding: 0 24px;
   pointer-events: none;
+}
+
+.swipe-hint {
+  font-size: 13px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+  pointer-events: none;
+  animation: hint-pulse 2s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1.0; }
 }
 
 .touch-btn {
   pointer-events: auto;
-  width: 68px;
-  height: 68px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.82);
   border: 3px solid #00b4d8;
   color: #00b4d8;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 900;
   display: flex;
   justify-content: center;
@@ -199,6 +217,41 @@ body, html {
   background: #00b4d8;
   color: #ffffff;
   transform: scale(0.92);
+}
+
+/* Mobile Pause Button - always visible on touch, hidden on desktop */
+#mobile-pause-btn {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.90);
+  border: 3px solid #ff3377;
+  color: #ff3377;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15), 0 3px 0 #cbd5e1;
+  pointer-events: auto;
+  transition: transform 0.1s;
+  z-index: 15;
+  /* Hidden on large screens (keyboard users have ESC/P) */
+  display: none;
+}
+#mobile-pause-btn:active {
+  transform: translateX(-50%) scale(0.9);
+}
+
+/* Show pause button on touch-capable devices */
+@media (hover: none) and (pointer: coarse) {
+  #mobile-pause-btn {
+    display: flex;
+  }
 }
 
 /* === FULLSCREEN 1-COLUMN CANDY TOY MODAL (NO SCROLL) === */

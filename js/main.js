@@ -113,11 +113,22 @@ class Game {
     }
   }
 
+
   bindTouchUI() {
     this.input.bindTouchButtons(
       document.getElementById('touch-left'),
       document.getElementById('touch-right')
     );
+
+    // Mobile pause button (only visible on touch devices via CSS media query)
+    const mobilePauseBtn = document.getElementById('mobile-pause-btn');
+    if (mobilePauseBtn) {
+      mobilePauseBtn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.input.pausePressed = true;
+      });
+    }
   }
 
   initPWA() {
@@ -295,11 +306,19 @@ class Game {
     // Update Entities
     const targetCarX = this.input.getTargetX();
     this.playerCar.update(targetCarX, this.currentSpeed, this.input.brake, dt);
+
+    // Road curve: tilts road group like a banked curve, returns offset for camera
+    const curveOffset = this.road.updateCurve(dt);
     this.road.update(this.currentSpeed, dt);
+
+    // Environment parallax: shift scenery slower than camera for depth feel
+    this.env.group.position.x += (-curveOffset * 0.3 - this.env.group.position.x) * 2.5 * dt;
     this.env.update(this.currentSpeed, dt);
+
     this.weather.update(this.currentSpeed, dt);
     this.vfx.update(dt);
     this.vfx.updateShield(this.playerCar.group.position, !!this.activePowerups.shield, dt);
+    this._lastCurveOffset = curveOffset;
 
     // Traffic Near Miss
     this.traffic.update(this.currentSpeed, this.playerCar.group.position, dt, () => {
@@ -444,7 +463,7 @@ class Game {
     );
 
     // Update Camera & Render
-    this.renderer.updateCamera(this.playerCar.group.position, this.playerCar.group.rotation, isNitro, dt);
+    this.renderer.updateCamera(this.playerCar.group.position, this.playerCar.group.rotation, isNitro, dt, this._lastCurveOffset || 0);
     this.renderer.render();
   }
 }

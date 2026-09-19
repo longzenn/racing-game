@@ -103,7 +103,7 @@ class GraphicsRenderer {
     return this.cameraMode;
   }
 
-  updateCamera(carPosition, carRotation, isBoosting, dt) {
+  updateCamera(carPosition, carRotation, isBoosting, dt, curveOffset = 0) {
     // Dynamic FOV on boost
     const targetFov = isBoosting ? this.baseFov + 10 : this.baseFov;
     this.currentFov += (targetFov - this.currentFov) * 5 * dt;
@@ -121,23 +121,30 @@ class GraphicsRenderer {
       this.shakeIntensity = Math.max(0, this.shakeIntensity - this.shakeDecay * dt);
     }
 
+    // Road curve: camera looks slightly in the direction of the bend
+    // curveOffset is positive = road curves right → camera looks right
+    const curveLookX = curveOffset * 0.80;
+
     if (this.cameraMode === 0) {
-      // Third-Person Chase
+      // Third-Person Chase — camera tilts with bend (classic OutRun feel)
       const idealOffset = new THREE.Vector3(carPosition.x * 0.35, 5.8, 11.0);
-      const idealLookAt = new THREE.Vector3(carPosition.x * 0.65, 1.2, -18);
+      const idealLookAt = new THREE.Vector3(carPosition.x * 0.65 + curveLookX, 1.2, -18);
 
       this.camera.position.lerp(idealOffset.add(shakeOffset), 12 * dt);
       this.camera.lookAt(idealLookAt);
+
+      // Camera roll reinforces the banking sensation
+      this.camera.rotation.z += (curveOffset * 0.018 - this.camera.rotation.z) * 5 * dt;
     } else if (this.cameraMode === 1) {
       // Hood View
       const hoodPos = new THREE.Vector3(carPosition.x, 2.1, carPosition.z - 0.8).add(shakeOffset);
       this.camera.position.copy(hoodPos);
-      this.camera.lookAt(carPosition.x, 1.8, -35);
+      this.camera.lookAt(carPosition.x + curveLookX, 1.8, -35);
     } else {
       // Drone View
       const dronePos = new THREE.Vector3(carPosition.x * 0.2, 17, 16).add(shakeOffset);
       this.camera.position.lerp(dronePos, 10 * dt);
-      this.camera.lookAt(0, 0, -12);
+      this.camera.lookAt(curveLookX * 0.4, 0, -12);
     }
   }
 
