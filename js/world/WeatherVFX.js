@@ -1,5 +1,5 @@
 ﻿/**
- * Atmospheric Weather Particles (Rain, Synthwave Stars, Stardust, Sandstorm)
+ * Atmospheric Weather Particles (Rain, Snow, Embers, Synthwave Stars, Stardust, Sandstorm)
  */
 class WeatherVFX {
   constructor(scene) {
@@ -31,6 +31,14 @@ class WeatherVFX {
         velocities[i * 3] = -0.5;
         velocities[i * 3 + 1] = -55;
         velocities[i * 3 + 2] = 10;
+      } else if (type === 'snow') {
+        velocities[i * 3] = (Math.random() - 0.5) * 4;
+        velocities[i * 3 + 1] = -8;
+        velocities[i * 3 + 2] = 8;
+      } else if (type === 'ember') {
+        velocities[i * 3] = (Math.random() - 0.5) * 6;
+        velocities[i * 3 + 1] = 12 + Math.random() * 8; // Float upwards
+        velocities[i * 3 + 2] = 15;
       } else if (type === 'dust') {
         velocities[i * 3] = -12;
         velocities[i * 3 + 1] = -2;
@@ -50,6 +58,12 @@ class WeatherVFX {
     if (type === 'rain') {
       pColor = 0x80d8ff;
       pSize = 0.8;
+    } else if (type === 'snow') {
+      pColor = 0xffffff;
+      pSize = 1.1;
+    } else if (type === 'ember') {
+      pColor = 0xff5500;
+      pSize = 1.3;
     } else if (type === 'dust') {
       pColor = 0xdd8844;
       pSize = 1.2;
@@ -79,11 +93,19 @@ class WeatherVFX {
       positions[i * 3 + 1] += this.velocities[i * 3 + 1] * dt;
       positions[i * 3 + 2] += (this.velocities[i * 3 + 2] + speed * 0.4) * dt;
 
-      // Wrap back when hitting ground or passing camera
-      if (positions[i * 3 + 1] < 0 || positions[i * 3 + 2] > 25) {
-        positions[i * 3] = (Math.random() - 0.5) * 120;
-        positions[i * 3 + 1] = 40;
-        positions[i * 3 + 2] = -180;
+      // Wrap back
+      if (this.weatherType === 'ember') {
+        if (positions[i * 3 + 1] > 45 || positions[i * 3 + 2] > 25) {
+          positions[i * 3] = (Math.random() - 0.5) * 120;
+          positions[i * 3 + 1] = 0.5;
+          positions[i * 3 + 2] = -180;
+        }
+      } else {
+        if (positions[i * 3 + 1] < 0 || positions[i * 3 + 2] > 25) {
+          positions[i * 3] = (Math.random() - 0.5) * 120;
+          positions[i * 3 + 1] = 40;
+          positions[i * 3 + 2] = -180;
+        }
       }
     }
 

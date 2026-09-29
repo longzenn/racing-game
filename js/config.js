@@ -1,5 +1,6 @@
 ﻿/**
  * Cyber Racer 3D - Kids Edition Configuration
+ * 8 Colorful Maps & 8 Cute Cartoon Chibi Cars
  */
 const CONFIG = {
   // 5 Lanes for easy steering & coin catching
@@ -59,7 +60,7 @@ const CONFIG = {
     }
   },
 
-  // 4 Colorful Maps
+  // 8 Colorful Maps for Kids
   MAPS: {
     rainbow: {
       id: 'rainbow',
@@ -74,7 +75,7 @@ const CONFIG = {
       lightColor: 0xfff6cf,
       dirIntensity: 0.85,
       roadColor: 0x3a3f47,
-      roadSideColor: 0x62c370, // Thảm cỏ xanh mướt hai bên
+      roadSideColor: 0x62c370,
       lineColor: 0xffffff,
       barrierColor: 0xff3399,
       weather: 'stardust',
@@ -95,7 +96,7 @@ const CONFIG = {
       lightColor: 0xff7733,
       dirIntensity: 0.9,
       roadColor: 0x2e3038,
-      roadSideColor: 0xf4d06f, // Bãi cát vàng
+      roadSideColor: 0xf4d06f,
       lineColor: 0xffea00,
       barrierColor: 0x00c49f,
       weather: 'stars',
@@ -144,10 +145,94 @@ const CONFIG = {
       themeStyle: 'desert',
       musicStyle: 'desert',
       desc: 'Hẻm núi cát vàng huyền bí, cây xương rồng vui nhộn và đá sa thạch khổng lồ.'
+    },
+    arctic: {
+      id: 'arctic',
+      name: 'Xứ Sở Băng Tuyết',
+      tag: 'NGƯỜI TUYẾT & BĂNG GIÁ',
+      skyColor: 0x8ae0ff,
+      fogColor: 0xc4efff,
+      fogNear: 60,
+      fogFar: 230,
+      ambientColor: 0xebf8ff,
+      ambientIntensity: 0.88,
+      lightColor: 0xffffff,
+      dirIntensity: 0.9,
+      roadColor: 0x223040,
+      roadSideColor: 0xf0faff,
+      lineColor: 0x00f2ff,
+      barrierColor: 0x00b4d8,
+      weather: 'snow',
+      themeStyle: 'arctic',
+      musicStyle: 'arctic',
+      desc: 'Thế giới băng tuyết lấp lánh với những chú người tuyết dễ thương, cây thông và nhà băng igloo.'
+    },
+    volcano: {
+      id: 'volcano',
+      name: 'Đảo Núi Lửa',
+      tag: 'NHAM THẠCH ĐỎ RỰC',
+      skyColor: 0x3d1318,
+      fogColor: 0x5a1a1f,
+      fogNear: 50,
+      fogFar: 210,
+      ambientColor: 0xff8866,
+      ambientIntensity: 0.75,
+      lightColor: 0xff5500,
+      dirIntensity: 0.9,
+      roadColor: 0x22181c,
+      roadSideColor: 0x2a1410,
+      lineColor: 0xff7700,
+      barrierColor: 0xffaa00,
+      weather: 'ember',
+      themeStyle: 'volcano',
+      musicStyle: 'volcano',
+      desc: 'Vùng đất núi lửa sôi động với đá dung nham đỏ rực, tinh thể lửa và nham thạch kỳ thú.'
+    },
+    space: {
+      id: 'space',
+      name: 'Vũ Trụ Ngân Hà',
+      tag: 'HÀNH TINH & VÌ SAO',
+      skyColor: 0x090617,
+      fogColor: 0x160d2e,
+      fogNear: 50,
+      fogFar: 230,
+      ambientColor: 0x7b5ea7,
+      ambientIntensity: 0.7,
+      lightColor: 0xbd00ff,
+      dirIntensity: 0.85,
+      roadColor: 0x130e26,
+      roadSideColor: 0x070412,
+      lineColor: 0xd946ef,
+      barrierColor: 0x00ffff,
+      weather: 'stardust',
+      themeStyle: 'space',
+      musicStyle: 'space',
+      desc: 'Đường đua giữa các vì sao lấp lánh, hành tinh Saturn khổng lồ có vành đai và đĩa bay UFO.'
+    },
+    forest: {
+      id: 'forest',
+      name: 'Rừng Nấm Thần Tiên',
+      tag: 'ĐOM ĐÓM & HOA KHỔNG LỒ',
+      skyColor: 0x0f2b20,
+      fogColor: 0x184232,
+      fogNear: 55,
+      fogFar: 220,
+      ambientColor: 0x40916c,
+      ambientIntensity: 0.8,
+      lightColor: 0x74c69d,
+      dirIntensity: 0.85,
+      roadColor: 0x1c2b22,
+      roadSideColor: 0x0d3822,
+      lineColor: 0xa3e635,
+      barrierColor: 0x38bdf8,
+      weather: 'stardust',
+      themeStyle: 'forest',
+      musicStyle: 'forest',
+      desc: 'Khu rừng kỳ diệu với những cây nấm phát sáng to đùng, cây cổ thụ và hoa thần tiên rực rỡ.'
     }
   },
 
-  // Playable Cars - Default is Buggy from demo!
+  // 8 Playable Chibi Cars for Kids
   CARS: {
     buggy: {
       id: 'buggy',
@@ -163,23 +248,55 @@ const CONFIG = {
       type: 'Hyper Sports',
       handling: 1.15,
       acceleration: 1.15,
-      desc: 'Siêu xe thể thao màu sắc với dải đèn LED lấp lánh.'
+      desc: 'Siêu xe thể thao màu sắc với dải kính râm ngầu và đèn LED lấp lánh.'
     },
     phantom: {
       id: 'phantom',
       name: 'Phi Thuyền Tốc Độ',
-      type: 'Supercar',
+      type: 'Astro Rocket',
       handling: 1.05,
       acceleration: 1.25,
-      desc: 'Cỗ máy tốc độ với cánh gió thể thao phía sau cực ngầu.'
+      desc: 'Cỗ máy phi thuyền vũ trụ với cánh phi cơ và động cơ phản lực cực ngầu.'
     },
     interceptor: {
       id: 'interceptor',
-      name: 'Xe Bọc Thép Tí Hon',
-      type: 'Muscle Kart',
+      name: 'Xe Quái Thú Bánh Bự',
+      type: 'Monster Truck',
       handling: 0.95,
       acceleration: 1.2,
-      desc: 'Chiếc xe cơ bắp dũng mãnh, tiếng nổ máy píp píp vui tai.'
+      desc: 'Chiếc xe quái thú bánh khổng lồ, gầm cao dũng mãnh và dàn đèn vương miện trên nóc.'
+    },
+    fire_truck: {
+      id: 'fire_truck',
+      name: 'Cứu Hỏa Tí Hon',
+      type: 'Hero Truck',
+      handling: 1.05,
+      acceleration: 1.15,
+      desc: 'Xe cứu hỏa đỏ tươi dũng cảm với thang cứu hộ trên nóc và đèn chớp siren vui nhộn!'
+    },
+    police: {
+      id: 'police',
+      name: 'Cảnh Sát Nhí',
+      type: 'Patrol Kart',
+      handling: 1.25,
+      acceleration: 1.2,
+      desc: 'Xe tuần tra cảnh sát nhanh nhẹn với thanh đèn siren nháy xanh đỏ siêu nổi bật!'
+    },
+    formula: {
+      id: 'formula',
+      name: 'Tên Lửa F1 Nhí',
+      type: 'Formula Kart',
+      handling: 1.4,
+      acceleration: 1.3,
+      desc: 'Siêu xe đua công thức 1 tí hon với cánh gió xé gió và bánh đua lộ thiên chuyên nghiệp!'
+    },
+    bulldozer: {
+      id: 'bulldozer',
+      name: 'Xe Lu Công Trình',
+      type: 'Work Dozer',
+      handling: 0.9,
+      acceleration: 1.25,
+      desc: 'Chiếc xe công trình bánh to tròn xoe với gầu cào dũng mãnh và ống khói đồ chơi ngộ nghĩnh!'
     }
   },
 

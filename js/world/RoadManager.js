@@ -148,6 +148,9 @@ class RoadManager {
   applyMapTheme(mapConfig) {
     this.roadMat.color.setHex(mapConfig.roadColor);
     this.railMat.color.setHex(mapConfig.barrierColor);
+    if (this.lineWhiteMat && mapConfig.lineColor) {
+      this.lineWhiteMat.color.setHex(mapConfig.lineColor);
+    }
 
     // Clear old rainbow strips
     this.rainbowStrips.forEach(s => this.group.remove(s));

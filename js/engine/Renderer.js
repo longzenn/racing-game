@@ -77,17 +77,23 @@ class GraphicsRenderer {
 
     // Adjust bloom dynamically per theme
     if (this.bloomPass) {
-      if (mapConfig.themeStyle === 'rainbow') {
-        // Crisp colorful daytime: disable bloom blowout
-        this.bloomPass.threshold = 0.92;
+      if (mapConfig.themeStyle === 'rainbow' || mapConfig.themeStyle === 'arctic') {
+        // Crisp colorful daytime / snow: disable bloom blowout
+        this.bloomPass.threshold = 0.90;
         this.bloomPass.strength = 0.25;
         this.renderer.toneMappingExposure = 1.0;
-      } else if (mapConfig.themeStyle === 'cyberpunk') {
-        this.bloomPass.threshold = 0.4;
-        this.bloomPass.strength = 0.7;
+      } else if (mapConfig.themeStyle === 'cyberpunk' || mapConfig.themeStyle === 'space') {
+        // Neon space & cyber glow
+        this.bloomPass.threshold = 0.42;
+        this.bloomPass.strength = 0.65;
         this.renderer.toneMappingExposure = 1.1;
+      } else if (mapConfig.themeStyle === 'volcano') {
+        // Warm lava embers glow
+        this.bloomPass.threshold = 0.52;
+        this.bloomPass.strength = 0.55;
+        this.renderer.toneMappingExposure = 1.05;
       } else {
-        this.bloomPass.threshold = 0.85;
+        this.bloomPass.threshold = 0.82;
         this.bloomPass.strength = 0.35;
         this.renderer.toneMappingExposure = 1.0;
       }
